@@ -38,21 +38,26 @@ const generateRepoInfoElement = (name, login, stars) => {
 }
 
 const showSearchResult = (repositories) => {
-  clearResults()
-  clearInfo()
+	clearResults()
 
-  const repositoriesElements = repositories.map(({ name, owner, stargazers_count }) => {
-    const el = generateRepoItem (name)
-    el.addEventListener('click', () => {
-      const repItem = generateRepoInfoElement(name, owner.login, stargazers_count)
-      document.body.appendChild(repItem)
-      search.value = ''
-      clearResults()
-    }, { once: true })
-    return el
-  })
+	const repositoriesElements = repositories.map(({ name, owner, stargazers_count }) => {
+		const el = generateRepoItem(name)
 
-  list.replaceChildren(...repositoriesElements)
+		list.addEventListener('click', function addItem(e) {
+			if (e.target === el) {
+				console.log(el)
+				const repItem = generateRepoInfoElement(name, owner.login, stargazers_count)
+				document.body.appendChild(repItem)
+				search.value = '';
+			}
+			clearResults();
+			this.removeEventListener('click', addItem);
+			e.target.removeEventListener('click', addItem)
+		}, { once: true })
+		return el
+	})
+
+	list.replaceChildren(...repositoriesElements)
 }
 
 const getAndShowRepositories = async () => {
